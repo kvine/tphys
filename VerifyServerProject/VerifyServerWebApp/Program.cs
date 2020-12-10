@@ -26,7 +26,7 @@ namespace VerifyServerWebApp
                 //new LibraryItem(Platform.Linux, Bitness.x64,
                 //    new LibraryFile("libTestLib.so", accessor.Binary("libTestLib.so")))
 
-                new LibraryItem(Platform.MacOs, Bitness.x64,
+                new LibraryItem(Platform.Linux, Bitness.x64,
                     // new LibraryFile("libVerifyLibrary.dylib", accessor.Binary("libVerifyLibrary.dylib")),
                      new LibraryFile("libVerifyLibrary.so", accessor.Binary("libVerifyLibrary.so"))
                     )
