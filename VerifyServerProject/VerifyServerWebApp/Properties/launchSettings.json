@@ -21,7 +21,7 @@
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "api/values",
-      "applicationUrl": "https://*:8861;http://*:8861",
+      "applicationUrl": "http://*:8861",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

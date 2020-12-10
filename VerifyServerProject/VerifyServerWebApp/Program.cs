@@ -38,7 +38,7 @@ namespace VerifyServerWebApp
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseUrls("https://*:8861;http://*:8861")
+                .UseUrls("http://*:8861")
                 .UseStartup<Startup>();
     }
 }
