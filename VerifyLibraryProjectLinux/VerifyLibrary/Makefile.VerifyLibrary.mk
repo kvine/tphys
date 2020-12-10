@@ -81,7 +81,7 @@ mainbuild_VerifyLibrary_release: prebuild_VerifyLibrary_release $(VerifyLibrary_
 prebuild_VerifyLibrary_release:
 
 $(VerifyLibrary_release_bin): $(VerifyLibrary_release_obj) 
-	#mkdir -p `dirname ./bin/libVerifyLibrary_x64.so`
+	mkdir -p `dirname ./bin/libVerifyLibrary_x64.so`
 	#$(CXX) -shared $(VerifyLibrary_release_obj) $(VerifyLibrary_release_lflags) -lc -o $@ 
 	$(CXX) -shared $(VerifyLibrary_release_lflags) $(VerifyLibrary_release_obj) -lc -o $@ 
 	$(ECHO) building $@ complete!
