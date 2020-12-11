@@ -14,6 +14,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
  
     <EmbeddedResource Include="libVerifyLibrary.so" />
+    <EmbeddedResource Include="libhello.so" />
  </ItemGroup>
 
 </Project>
