@@ -135,7 +135,7 @@ namespace AuthServer.PhysxVerify
         /// 创建指向校验管理类对象的指针
         /// </summary>
         /// <returns>VerifyMgr*</returns>
-        [DllImport("VerifyLibrary")]
+        [DllImport("libVerifyLibrary")]
         static extern IntPtr  CreateVerifyMgr();
 
         /// <summary>
