@@ -17,7 +17,7 @@ VerifyLibrary_cppfiles   += ./Src/VerifyMgr.cpp
 VerifyLibrary_cppfiles   += ./Src/VeriAPI.cpp
 
 VerifyLibrary_release_hpaths    := 
-VerifyLibrary_release_hpaths    += ./Src
+VerifyLibrary_release_hpaths    += ./Include
 VerifyLibrary_release_hpaths    += ./PhysXInclude
 VerifyLibrary_release_hpaths    += ./PhysXInclude/collision
 VerifyLibrary_release_hpaths    += ./PhysXInclude/common
