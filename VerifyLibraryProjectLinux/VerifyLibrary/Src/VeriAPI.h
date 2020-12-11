@@ -5,7 +5,7 @@
 		#define VERIAPI_API __declspec(dllimport)
 	#endif
 #else
-	#define VERIAPI_API
+	#define VERIAPI_API __attribute__((visibility("default")))
 #endif
 
 #include "VerifyMgr.h"
