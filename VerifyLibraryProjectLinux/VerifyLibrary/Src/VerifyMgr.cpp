@@ -68,12 +68,14 @@ int VerifyMgr::GetFreeSlotIndex(int sceneId)
 
 void VerifyMgr::BackSlotIndex(int sceneId, int slotIndex)
 {
+	m_pMutex->Lock();
 	std::map<int, IndexQue*>::iterator iter;
 	iter = mapIndexQueue.find(sceneId);
 	if(iter != mapIndexQueue.end())
 	{
 		iter->second->PushSlotIndex(slotIndex);
 	}
+	m_pMutex->Unlock();
 }
 
 SimulationMgr* VerifyMgr::GetSimulationMgr(int slotIndex)
