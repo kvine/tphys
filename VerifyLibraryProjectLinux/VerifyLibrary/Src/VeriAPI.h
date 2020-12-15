@@ -1,14 +1,23 @@
 #ifdef _WIN32
+    #include "./../../PxVisualizationProjectNew/PxVisualizationProject/PxVisualizationProject/SimulateMgr/VerifyMgr.h"
+
 	#ifdef VERIAPI_EXPORTS
 		#define VERIAPI_API __declspec(dllexport)
 	#else
 		#define VERIAPI_API __declspec(dllimport)
 	#endif
 #else
-	#define VERIAPI_API __attribute__((visibility("default")))
+    #ifdef __linux__
+        #include "VerifyMgr.h"
+        #define VERIAPI_API __attribute__ ((visibility("default")))
+    #else
+        #include "./../../PxVisualizationProjectNew/PxVisualizationProject/PxVisualizationProject/SimulateMgr/VerifyMgr.h"
+
+        #define VERIAPI_API
+    #endif
 #endif
 
-#include "VerifyMgr.h"
+
 
 extern "C"{
     struct Vector3{
@@ -25,15 +34,6 @@ extern "C"{
         Vector3 p;
     };
 
-//    struct MyRayCastHit
-//    {
-//        PxRigidActor*   actor;
-//        Vector3          point;
-//        Vector3          normal;
-//        float           distance;
-//        PxShape*        shape;
-//    };
-
     struct RayCastHitExtend{
         RayCastHit hitInfo;
         bool bHit;
@@ -41,9 +41,7 @@ extern "C"{
 
     VERIAPI_API Vector3 CreateVector3(PxVec3& pv);
 
-//    VERIAPI_API MyRayCastHit CreateMyCastHit(RayCastHit& hitInfo);
-
-    VERIAPI_API VerifyMgr* CreateVerifyMgr();
+    VERIAPI_API VerifyMgr* CreateVerifyMgr(unsigned int iSceneConcurrencyCnt);
 
     VERIAPI_API int GetFreeSlotIndex(VerifyMgr* pVerifyMgr, int sceneId);
 
@@ -65,9 +63,13 @@ extern "C"{
 
     VERIAPI_API void InitCallback(SimulationMgr*  pSimulationMgr, Action pFixedUpdate,ActionCollision pCollisionEnter, ActionCollision pCollisionStay, ActionCollision pCollisionExit,ActionTrigger pTriggerEnter, ActionTrigger pTriggerStay, ActionTrigger pTriggerExit);
 
-    VERIAPI_API RayCastHitExtend* RaycastHit(SimulationMgr*  pSimulationMgr, Vector3 pOrigin, Vector3 pDir, PxReal distance, int layerMask);
+    VERIAPI_API void CleanCallback(SimulationMgr*  pSimulationMgr);
 
-    VERIAPI_API RayCastHitExtend* SphereCast(SimulationMgr*  pSimulationMgr, PxReal radius, Vector3 pOrigin, Vector3 pDir,  PxReal distance, int layerMask);
+    VERIAPI_API RayCastHit* GetRaycasthit(SimulationMgr* pSimulationMgr);
+    
+    VERIAPI_API bool RaycastHit(SimulationMgr* pSimulationMgr, Vector3 pOrigin, Vector3 pDir, PxReal distance, int layerMask, RayCastHit* pHitInfo);
+
+    VERIAPI_API bool SphereCast(SimulationMgr*  pSimulationMgr, PxReal radius, Vector3 pOrigin, Vector3 pDir,  PxReal distance, int layerMask, RayCastHit* pHitInfo);
 
     VERIAPI_API Rigidbody* GetRigidbody(SimulationMgr*  pSimulationMgr);
 

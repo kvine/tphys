@@ -1,8 +1,14 @@
 #ifndef simulationMgr_h
 #define simulationMgr_h
 
-#include "physics_scene_manager.h"
-#include "golf.h"
+#ifdef __linux__
+    #include "physics_scene_manager.h"
+    #include "golf.h"
+#else
+    #include "./../CollisionCommon/physics_scene_manager.h"
+    #include "./../CollisionCommon/golf.h"
+#endif
+
 using namespace Golf3D;
 class SimulationMgr
 {
@@ -24,7 +30,11 @@ public:
     
 	void InitCallback(Action pFixedUpdate,ActionCollision pCollisionEnter, ActionCollision pCollisionStay, ActionCollision pCollisionExit,ActionTrigger pTriggerEnter, ActionTrigger pTriggerStay, ActionTrigger pTriggerExit);
     
+    void CleanCallback();
+    
     void SetFlagpoleActive(bool active);
+    
+    RayCastHit* GetRayCastHit();
 private:
 	PhysicsSceneManager* m_pPhysxSceneMgr;
 	Golf* m_pGolf;
@@ -32,7 +42,7 @@ private:
 	int m_iSlotIndex;
 	bool m_bInitPhysx;
 	bool m_bLoadedSceneData;
-
+    RayCastHit* m_pRaycasthit; //创建一个指针，避免频繁打射线的new，delete
 };
 
 #endif

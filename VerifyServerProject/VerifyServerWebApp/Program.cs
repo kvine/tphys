@@ -9,15 +9,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NativeLibraryManager;
-using System.Runtime.InteropServices;
 
 namespace VerifyServerWebApp
 {
     public class Program
     {
-        
-         [DllImport("libhello")]
-        private static extern int add(int a, int b);
         public static void Main(string[] args)
         {
             var accessor = new ResourceAccessor(Assembly.GetExecutingAssembly());
@@ -30,20 +26,10 @@ namespace VerifyServerWebApp
                 //new LibraryItem(Platform.Linux, Bitness.x64,
                 //    new LibraryFile("libTestLib.so", accessor.Binary("libTestLib.so")))
 
-                new LibraryItem(Platform.Linux, Bitness.x64,
-                    // new LibraryFile("libVerifyLibrary.dylib", accessor.Binary("libVerifyLibrary.dylib")),
-                     new LibraryFile("libVerifyLibrary.so", accessor.Binary("libVerifyLibrary.so"))
-                    ),
-
-                 new LibraryItem(Platform.Linux, Bitness.x64,
-                    // new LibraryFile("libVerifyLibrary.dylib", accessor.Binary("libVerifyLibrary.dylib")),
-                     new LibraryFile("libhello.so", accessor.Binary("libhello.so"))
-                    )
+                new LibraryItem(Platform.Linux, Bitness.x64, new LibraryFile("libVerifyLibrary.so", accessor.Binary("libVerifyLibrary.so"))   )
                     );
 
             libManager.LoadNativeLibrary();
-            int l= add(100, 200);
-            Console.WriteLine("Hello from C#!, l="+l);
             CreateWebHostBuilder(args).Build().Run();
         }
 
@@ -51,10 +37,5 @@ namespace VerifyServerWebApp
             WebHost.CreateDefaultBuilder(args)
                 .UseUrls("http://*:8861")
                 .UseStartup<Startup>();
-
-
-
     }
-
-     
 }

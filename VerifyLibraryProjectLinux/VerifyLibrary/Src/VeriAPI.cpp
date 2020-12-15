@@ -22,9 +22,10 @@ extern "C"
 //        return castHit;
 //    }
     
-    VERIAPI_API VerifyMgr* CreateVerifyMgr()
+    VERIAPI_API VerifyMgr* CreateVerifyMgr(unsigned int iSceneConcurrencyCnt)
     {
-        return new VerifyMgr();
+        printf("CreateVerifyMgr iSceneConcurrencyCnt %ud \n", iSceneConcurrencyCnt);
+        return new VerifyMgr(iSceneConcurrencyCnt);
     }
 
     VERIAPI_API int GetFreeSlotIndex(VerifyMgr* pVerifyMgr, int sceneId)
@@ -32,7 +33,7 @@ extern "C"
         if(pVerifyMgr != NULL){
             return pVerifyMgr->GetFreeSlotIndex(sceneId);
         }
-        printf("GetFreeSlotIndex pVerifyMgr is null \n");
+        fprintf(stderr,"GetFreeSlotIndex pVerifyMgr is null \n");
         return -2;
     }
 
@@ -42,7 +43,7 @@ extern "C"
             pVerifyMgr->BackSlotIndex(sceneId, slotIndex);
         }
         else{
-            printf("BackSlotIndex pVerifyMgr is null \n");
+            fprintf(stderr,"BackSlotIndex pVerifyMgr is null \n");
         }
     }
 
@@ -51,7 +52,7 @@ extern "C"
         if(pVerifyMgr != NULL){
            return pVerifyMgr->GetSimulationMgr(slotIndex);
         }
-        printf("GetSimulationMgr pVerifyMgr is null \n");
+        fprintf(stderr,"GetSimulationMgr pVerifyMgr is null \n");
         return NULL;
     }
 
@@ -60,7 +61,7 @@ extern "C"
         if(pSimulationMgr != NULL){
             return pSimulationMgr->InitPhysx();
         }
-        printf("InitPhysics null \n");
+        fprintf(stderr,"InitPhysics null \n");
         return false;
     }
 
@@ -69,7 +70,7 @@ extern "C"
         if(pSimulationMgr != NULL){
             return pSimulationMgr->LoadSceneData(filePath);
         }
-        printf("LoadXMLDataFile null \n");
+        fprintf(stderr,"LoadXMLDataFile null \n");
         return false;
     }
 
@@ -78,7 +79,7 @@ extern "C"
         if(pSimulationMgr != NULL){
             return pSimulationMgr->CreateBall(PxVec3(pos.x, pos.y, pos.z), PxQuat(quat.x, quat.y, quat.z, quat.w), radius, mass);
         }
-        printf("CreateBall null \n");
+        fprintf(stderr,"CreateBall null \n");
         return false;
     }
 
@@ -88,7 +89,7 @@ extern "C"
             pSimulationMgr->Simulation();
         }
         else{
-            printf("StepPhysics null \n");
+            fprintf(stderr,"StepPhysics null \n");
         }
     }
 
@@ -98,7 +99,7 @@ extern "C"
             pSimulationMgr->SetFlagpoleActive(active);
         }
         else{
-            printf("SetFlagpoleActive null \n");
+            fprintf(stderr,"SetFlagpoleActive null \n");
         }
     }
 
@@ -109,7 +110,7 @@ extern "C"
             pVerifyMgr = NULL;
         }
         else{
-            printf("Release pVerifyMgr is null \n");
+            fprintf(stderr,"Release pVerifyMgr is null \n");
         }
     }
 
@@ -119,73 +120,51 @@ extern "C"
             pSimulationMgr->InitCallback(pFixedUpdate,pCollisionEnter, pCollisionStay, pCollisionExit,pTriggerEnter, pTriggerStay, pTriggerExit);
         }
         else{
-            printf("InitCallback null \n");
+            fprintf(stderr,"InitCallback null \n");
         }
     }
 
-    VERIAPI_API RayCastHitExtend* RaycastHit(SimulationMgr*  pSimulationMgr, Vector3 pOrigin, Vector3 pDir, PxReal distance, int layerMask)
+    VERIAPI_API void CleanCallback(SimulationMgr*  pSimulationMgr)
     {
-        RayCastHitExtend* pHitExtend = new RayCastHitExtend();
         if(pSimulationMgr != NULL){
-            pHitExtend->bHit = pSimulationMgr->RaycastHit(PxVec3(pOrigin.x, pOrigin.y, pOrigin.z), PxVec3(pDir.x, pDir.y, pDir.z), distance, pHitExtend->hitInfo, layerMask);
+            pSimulationMgr->CleanCallback();
         }
         else{
-            printf("RaycastHit null \n");
-            pHitExtend->bHit = false;
+            fprintf(stderr,"CleanCallback null \n");
         }
-        return pHitExtend;
-//        RayCastHitExtend hitExtend =RayCastHitExtend();
-//        if(pSimulationMgr != NULL){
-//            RayCastHit hitInfo = RayCastHit();
-//
-//            if(pSimulationMgr->RaycastHit(PxVec3(pOrigin.x, pOrigin.y, pOrigin.z), PxVec3(pDir.x, pDir.y, pDir.z), distance, hitInfo, layerMask))
-//            {
-//                hitExtend.bHit = true;
-//                hitExtend.hitInfo = CreateMyCastHit(hitInfo);
-//            }
-//            else
-//            {
-//                hitExtend.bHit = false;
-//            }
-//
-//        }
-//        else{
-//            printf("RaycastHit null \n");
-//            hitExtend.bHit = false;
-//        }
-//        return hitExtend;
     }
 
-    VERIAPI_API RayCastHitExtend* SphereCast(SimulationMgr*  pSimulationMgr, PxReal radius, Vector3 pOrigin, Vector3 pDir, PxReal distance, int layerMask)
+    VERIAPI_API RayCastHit* GetRaycasthit(SimulationMgr* pSimulationMgr)
     {
-        RayCastHitExtend* pHitExtend = new RayCastHitExtend();
         if(pSimulationMgr != NULL){
-            pHitExtend->bHit = pSimulationMgr->SphereCast(radius, PxVec3(pOrigin.x, pOrigin.y, pOrigin.z), PxVec3(pDir.x, pDir.y, pDir.z), distance, pHitExtend->hitInfo, layerMask);
+            return pSimulationMgr->GetRayCastHit();
         }
         else{
-            printf("SphereCast null \n");
-            pHitExtend->bHit = false;
+            fprintf(stderr,"GetRaycasthit null \n");
+            return NULL;
         }
-        return pHitExtend;
-        
-//        RayCastHitExtend hitExtend =RayCastHitExtend();
-//       if(pSimulationMgr != NULL){
-//           RayCastHit hitInfo = RayCastHit();
-//           if(pSimulationMgr->SphereCast(radius, PxVec3(pOrigin.x, pOrigin.y, pOrigin.z), PxVec3(pDir.x, pDir.y, pDir.z), distance, hitInfo, layerMask))
-//           {
-//               hitExtend.bHit = true;
-//               hitExtend.hitInfo = CreateMyCastHit(hitInfo);
-//           }
-//           else
-//           {
-//               hitExtend.bHit = false;
-//           }
-//       }
-//       else{
-//           printf("SphereCast null \n");
-//           hitExtend.bHit = false;
-//       }
-//       return hitExtend;
+    }
+
+    VERIAPI_API bool RaycastHit(SimulationMgr*  pSimulationMgr, Vector3 pOrigin, Vector3 pDir, PxReal distance, int layerMask, RayCastHit* pHitInfo)
+    {
+        if(pSimulationMgr != NULL && pHitInfo != NULL){
+            return pSimulationMgr->RaycastHit(PxVec3(pOrigin.x, pOrigin.y, pOrigin.z), PxVec3(pDir.x, pDir.y, pDir.z), distance, *pHitInfo, layerMask);
+        }
+        else{
+            fprintf(stderr,"RaycastHit null \n");
+            return false;
+        }
+    }
+
+    VERIAPI_API bool SphereCast(SimulationMgr*  pSimulationMgr, PxReal radius, Vector3 pOrigin, Vector3 pDir, PxReal distance, int layerMask, RayCastHit* pHitInfo)
+    {
+        if(pSimulationMgr != NULL && pHitInfo != NULL){
+            return pSimulationMgr->SphereCast(radius, PxVec3(pOrigin.x, pOrigin.y, pOrigin.z), PxVec3(pDir.x, pDir.y, pDir.z), distance, *pHitInfo, layerMask);
+        }
+        else{
+            fprintf(stderr,"SphereCast null \n");
+            return false;
+        }
     }
 
     VERIAPI_API Rigidbody* GetRigidbody(SimulationMgr*  pSimulationMgr)
@@ -193,7 +172,7 @@ extern "C"
         if(pSimulationMgr != NULL){
             return pSimulationMgr->GetRigidbody();
         }
-        printf("GetRigidbody:: null \n");
+        fprintf(stderr,"GetRigidbody:: null \n");
         return NULL;
     }
 
@@ -207,7 +186,7 @@ extern "C"
             v.z = pv.z;
         }
         else{
-            printf("GetAngularVelocity:: null \n");
+            fprintf(stderr,"GetAngularVelocity:: null \n");
             v.x = v.y = v.z = 0;
         }
         return v;
@@ -230,7 +209,7 @@ extern "C"
             v.z = pv.z;
         }
         else{
-            printf("GetLinearVelocity:: null \n");
+            fprintf(stderr,"GetLinearVelocity:: null \n");
             v.x = v.y = v.z = 0;
         }
         return v;
@@ -249,7 +228,7 @@ extern "C"
         {
             return pRigid->IsSleeping();
         }
-        printf("IsSleeping:: null \n");
+        fprintf(stderr,"IsSleeping:: null \n");
         return false;
     }
 
@@ -264,7 +243,7 @@ extern "C"
             pRigid->SetKinematic(isKinematic);
         }
         else{
-            printf("SetKinematic:: null \n");
+            fprintf(stderr,"SetKinematic:: null \n");
         }
     }
 
@@ -273,7 +252,7 @@ extern "C"
         if(pRigid != NULL){
             return pRigid->IsKinematic();
         }
-        printf("GetKinematic:: null \n");
+        fprintf(stderr,"GetKinematic:: null \n");
         return false;
     }
 
@@ -282,7 +261,7 @@ extern "C"
         if(pRigid != NULL){
             return pRigid->GetMass();
         }
-        printf("GetMass:: null \n");
+        fprintf(stderr,"GetMass:: null \n");
         return -1;
     }
 
@@ -321,7 +300,7 @@ extern "C"
             trs.q = q;
         }
         else{
-            printf("GetGlobalPos:: null \n");
+           fprintf(stderr,"GetGlobalPos:: null \n");
         }
         return trs;
     }
@@ -331,7 +310,7 @@ extern "C"
         if(actor != NULL){
             return actor->getName();
         }
-        printf("GetActorName:: null \n");
+        fprintf(stderr,"GetActorName:: null \n");
         return "";
     }
 
@@ -351,7 +330,7 @@ extern "C"
                    arrMaterial[0]->getDynamicFriction());
         }
         else{
-            printf("pShape null \n");
+            fprintf(stderr,"pShape null \n");
         }
     }
 
@@ -361,7 +340,7 @@ extern "C"
         {
             return pShape->getFlags().isSet(PxShapeFlag::eTRIGGER_SHAPE);
         }
-        printf("IsTrigger null \n");
+        fprintf(stderr,"IsTrigger null \n");
         return false;
     }
 }

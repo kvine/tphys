@@ -1,7 +1,11 @@
 #include "VerifyMgr.h"
 
-VerifyMgr::VerifyMgr()
+VerifyMgr::VerifyMgr(unsigned int iSceneConcurrencyCnt)
 {
+    m_iSceneConcurrencyCnt = iSceneConcurrencyCnt;
+    
+    PhysicsSceneManager::CreateFoundation();
+    
 	mapIndexQueue = std::map<int, IndexQue*>();
 	mapSimulationMgr = std::map<unsigned int, SimulationMgr*>();
 	m_pMutex = new MyMutex();
@@ -44,8 +48,8 @@ int VerifyMgr::GetFreeSlotIndex(int sceneId)
 	iter = mapIndexQueue.find(sceneId);
 	if (iter == mapIndexQueue.end())
 	{
-		int minIndex = sceneId * g_len;
-		int maxIndex = (sceneId + 1) * g_len;
+		int minIndex = sceneId * m_iSceneConcurrencyCnt;
+		int maxIndex = (sceneId + 1) * m_iSceneConcurrencyCnt;
 		IndexQue* pIndexQue = new IndexQue(minIndex, maxIndex);
 		
 		mapIndexQueue.insert(std::pair<int, IndexQue*>(sceneId, pIndexQue));

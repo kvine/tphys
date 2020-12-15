@@ -93,16 +93,19 @@ public:
 	PxMaterial* CreateMaterial(PxReal staticFriction, PxReal dynamicFriction, PxReal restitution, PxCombineMode::Enum frictionMode, PxCombineMode::Enum restitutionMode);
     
     PxRigidActor* FindStaticActorByTag(const char* tag);
+    
+    static bool CreateFoundation();
 private:
-	static PxFoundation*         m_foundation;
-	PxDefaultAllocator           m_allocator;
-	PxDefaultErrorCallback	     m_error_callback;
+	static PxFoundation*           g_foundation;
+    static PxDefaultAllocator*     g_allocator;
+	static PxDefaultErrorCallback* g_error_callback;
+    static PxStringTable*          g_stringTable;
     PxSceneDesc*                 m_sceneDesc;
 	PxPhysics*                   m_physics;
 	PxPvd*                       m_pvdCon;
 	PxCooking*                   m_cooking;
 	PxScene*                     m_scene;
-    PxStringTable*               m_stringTable;
+    
 	PxDefaultCpuDispatcher*      m_dispatcher;
 	PxSerializationRegistry*	 m_registery;
 

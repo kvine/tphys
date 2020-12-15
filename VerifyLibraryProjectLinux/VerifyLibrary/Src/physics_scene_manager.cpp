@@ -1,6 +1,23 @@
 #include "physics_scene_manager.h"
 
-PxFoundation* PhysicsSceneManager::m_foundation = NULL;
+PxFoundation*           PhysicsSceneManager::g_foundation = NULL;
+PxDefaultAllocator*     PhysicsSceneManager::g_allocator = NULL;
+PxDefaultErrorCallback* PhysicsSceneManager::g_error_callback = NULL;
+PxStringTable*          PhysicsSceneManager::g_stringTable = NULL;
+
+bool PhysicsSceneManager::CreateFoundation()
+{
+    g_allocator = new PxDefaultAllocator();
+    g_error_callback = new PxDefaultErrorCallback();
+    g_foundation = PxCreateFoundation(PX_FOUNDATION_VERSION, *g_allocator, *g_error_callback);
+    if (PhysicsSceneManager::g_foundation == NULL)
+    {
+        std::cerr << "PxCreateFoundation failed!" << std::endl;
+        return false;
+    }
+    g_stringTable = &PxStringTableExt::createStringTable(g_foundation->getAllocatorCallback());
+    return true;
+}
 
 int PhysicsSceneManager::GetUniqueIndentity()
 {
@@ -18,26 +35,24 @@ void PhysicsSceneManager::DetachCollisionEvent(unsigned int indentify) {
 
 bool PhysicsSceneManager::InitPhysics()
 {
-	if (PhysicsSceneManager::m_foundation == NULL)
+	if (PhysicsSceneManager::g_foundation == NULL)
 	{
-		m_foundation = PxCreateFoundation(PX_FOUNDATION_VERSION, m_allocator, m_error_callback);
-		if (PhysicsSceneManager::m_foundation == NULL)
-		{
-			std::cerr << "PxCreateFoundation failed!" << std::endl;
-			return false;
-		}
+        bool res = CreateFoundation();
+        if(!res){
+            return false;
+        }
 	}
 
 	SetupPvdDebug(false);
 	bool recordMemoryAllocations = true;
-	m_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *PhysicsSceneManager::m_foundation, PxTolerancesScale(), recordMemoryAllocations, m_pvdCon);
+	m_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *PhysicsSceneManager::g_foundation, PxTolerancesScale(), recordMemoryAllocations, m_pvdCon);
 	if (m_physics == NULL)
 	{
 		std::cerr << "PxCreatePhysics failed!" << std::endl;
 		return false;
 	}
 
-	m_cooking = PxCreateCooking(PX_PHYSICS_VERSION, *PhysicsSceneManager::m_foundation, PxCookingParams(PxTolerancesScale()));
+	m_cooking = PxCreateCooking(PX_PHYSICS_VERSION, *PhysicsSceneManager::g_foundation, PxCookingParams(PxTolerancesScale()));
 	if (m_cooking == NULL)
 	{
 		std::cerr << "PxCreateCooking failed!" << std::endl;
@@ -90,7 +105,7 @@ void PhysicsSceneManager::SetupPvdDebug(bool bSetUp)
 		const char*     pvd_host_ip = "127.0.0.1";  // IP of the PC which is running PVD
 		int             port = 5425;         // TCP port to connect to, where PVD is listening
 		unsigned int    timeout = 100;          // timeout in milliseconds to wait for PVD to respond,
-		m_pvdCon = PxCreatePvd(*PhysicsSceneManager::m_foundation);
+		m_pvdCon = PxCreatePvd(*PhysicsSceneManager::g_foundation);
 		PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate(pvd_host_ip, port, timeout);
 		m_pvdCon->connect(*transport, PxPvdInstrumentationFlag::eALL);
 	}
@@ -108,17 +123,15 @@ bool PhysicsSceneManager::ParseFromCollectionFile(const char* filePath)
 	PxDefaultFileInputData inputStream(filePath);
 	if (inputStream.isValid() == false)
 	{
-		printf("invalid file path %s \n", filePath);
+		fprintf(stderr,"invalid file path %s \n", filePath);
 		return false;
 	}
     
-    m_stringTable = &PxStringTableExt::createStringTable(m_foundation->getAllocatorCallback());
-    
-	collection = PxSerialization::createCollectionFromXml(inputStream, *PhysicsSceneManager::m_cooking, *m_registery, shared, m_stringTable);
+	collection = PxSerialization::createCollectionFromXml(inputStream, *PhysicsSceneManager::m_cooking, *m_registery, shared, g_stringTable);
 
 	if (collection == NULL)
 	{
-		printf("createCollectionFromXml failed \n");
+		fprintf(stderr,"createCollectionFromXml failed \n");
 		return false;
 	}
 	m_scene->addCollection(*collection);
@@ -162,11 +175,6 @@ void PhysicsSceneManager::CleanPhysics()
     
 	m_scene->release();
     
-    if(m_stringTable != NULL)
-    {
-        m_stringTable->release();
-    }
-    
 	m_dispatcher->release();
 
 	m_registery->release();
@@ -186,9 +194,26 @@ void PhysicsSceneManager::CleanPhysics()
 
 void PhysicsSceneManager::CleanPhysxFoundation()
 {
-    if(PhysicsSceneManager::m_foundation != NULL)
+    if(g_stringTable != NULL)
+    {
+       g_stringTable->release();
+    }
+    
+    if(g_foundation != NULL)
 	{
-        PhysicsSceneManager::m_foundation->release();
+        g_foundation->release();
+    }
+    
+    if(g_allocator != NULL)
+    {
+        delete g_allocator;
+        g_allocator = NULL;
+    }
+    
+    if(g_error_callback != NULL)
+    {
+        delete g_error_callback;
+        g_error_callback = NULL;
     }
 }
 

@@ -8,10 +8,16 @@ SimulationMgr::SimulationMgr(int slotIndex)
 	m_bLoadedSceneData = false;
     m_pGolf = NULL;
     m_pFlagpole = NULL;
+    m_pRaycasthit = NULL;
 }
 
 SimulationMgr::~SimulationMgr()
 {
+    if(m_pRaycasthit != NULL){
+        delete m_pRaycasthit;
+        m_pRaycasthit = NULL;
+    }
+    
     delete m_pPhysxSceneMgr;
     m_pPhysxSceneMgr = NULL;
 }
@@ -97,6 +103,11 @@ void SimulationMgr::InitCallback(Action pFixedUpdate,ActionCollision pCollisionE
     m_pGolf->InitTriggerCallback(pTriggerEnter, pTriggerStay, pTriggerExit);
 }
 
+void SimulationMgr::CleanCallback()
+{
+    m_pGolf->CleanCallback();
+}
+
 bool SimulationMgr::RaycastHit( PxVec3 origin,  PxVec3 unitDir, const PxReal distance, RayCastHit& hitInfo, int layerMask)
 {
 	return m_pPhysxSceneMgr->RaycastHit(origin, unitDir, distance, hitInfo, layerMask);
@@ -119,4 +130,12 @@ void SimulationMgr::SetFlagpoleActive(bool active)
     }
     
     m_pFlagpole->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, active);
+}
+
+RayCastHit* SimulationMgr::GetRayCastHit()
+{
+    if(m_pRaycasthit == NULL){
+        m_pRaycasthit = new RayCastHit();
+    }
+    return m_pRaycasthit;
 }

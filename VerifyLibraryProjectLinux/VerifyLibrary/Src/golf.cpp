@@ -13,13 +13,7 @@ namespace Golf3D
 	Golf::Golf(PhysicsSceneManager* sceneMgr, PxVec3 pos, PxQuat quat, float ballRadius, float mass)
 		:Behaviour(sceneMgr)
 	{		
-		m_pFunFixedUpdate = NULL;
-		m_pFunCollisionEnter = NULL;
-		m_pFunCollisionStay = NULL;
-		m_pFunCollisionExit = NULL;
-        m_pFunTriggerEnter = NULL;
-        m_pFunTriggerStay = NULL;
-        m_pFunTriggerExit = NULL;
+        CleanCallback();
         m_pRigidbody = NULL;
 		m_strName = "golfball";
 		CreateGolfBall(pos, quat, ballRadius, mass);
@@ -29,6 +23,17 @@ namespace Golf3D
 	{
 		
 	}
+
+    void Golf::CleanCallback()
+    {
+        m_pFunFixedUpdate = NULL;
+        m_pFunCollisionEnter = NULL;
+        m_pFunCollisionStay = NULL;
+        m_pFunCollisionExit = NULL;
+        m_pFunTriggerEnter = NULL;
+        m_pFunTriggerStay = NULL;
+        m_pFunTriggerExit = NULL;
+    }
 
 	void Golf::InitUpdateCallback(Action pFixedUpdate)
 	{
@@ -79,7 +84,7 @@ namespace Golf3D
 	{
 		if (m_pRigidbody == NULL)
 		{
-			std::cout << "rigidbody is null" << std::endl;
+            fprintf(stderr, "StrikeBall rigidbody is null \n");
 			return;
 		}
 		m_pRigidbody->SetKinematic(false);
@@ -91,7 +96,7 @@ namespace Golf3D
     {
         if (m_pRigidbody == NULL)
         {
-            std::cout << "rigidbody is null" << std::endl;
+            fprintf(stderr, "ResetPosAndQuat rigidbody is null \n");
             return;
         }
         m_pRigidbody->SetGlobalPos(PxTransform(pos, quat));
@@ -105,24 +110,17 @@ namespace Golf3D
 
 	void Golf::OnCollisionEnter(Collision* p_collision)
 	{
-        PxVec3 pos = m_pRigidbody->getGlobalPos().p;
-        printf("golf collision enter, hit gameobject layer %d , name: %s  pos(%f, %f, %f)\n", p_collision->dominanceGroup, p_collision->name, pos.x, pos.y, pos.z);
 		if (m_pFunCollisionEnter != NULL) { (*m_pFunCollisionEnter)(p_collision); }
 		else
 		{
-//            PxVec3 pos = m_pRigidbody->getGlobalPos().p;
-//			printf("golf collision enter, hit gameobject layer %d , name: %s  pos(%f, %f, %f)\n", p_collision->dominanceGroup, p_collision->name, pos.x, pos.y, pos.z);
+            PxVec3 pos = m_pRigidbody->getGlobalPos().p;
+            printf("golf collision enter, hit gameobject layer %d , name: %s  pos(%f, %f, %f)\n", p_collision->dominanceGroup, p_collision->name, pos.x, pos.y, pos.z);
 //			if (!m_pRigidbody->IsKinematic())
 //			{
 //				PxVec3 v = m_pRigidbody->GetLinearVelocity();
 //				v *= 0.9f;
 //				m_pRigidbody->SetLinearVelocity(v);
 //			}
-
-//
-			/*std::cout << "golf collision enter" << " ball x " << pos.x << " y " << pos.y << " z " << pos.z << std::endl;
-			printf("hit gameobject layer %d , hit transform pos is(%f, %f, %f) name: %s \n", p_collision->dominanceGroup,
-				p_collision->pTransform->p.x, p_collision->pTransform->p.y, p_collision->pTransform->p.z, p_collision->name);*/
 		}
 	}
 
@@ -151,15 +149,11 @@ namespace Golf3D
 
 	void Golf::OnCollisionExit(Collision* p_collision)
 	{
-        PxVec3 pos = m_pRigidbody->getGlobalPos().p;
-        printf("golf collision exit, hit gameobject layer %d , name: %s  pos(%f, %f, %f)\n", p_collision->dominanceGroup, p_collision->name, pos.x, pos.y, pos.z);
 		if (m_pFunCollisionExit != NULL) { (*m_pFunCollisionExit)(p_collision); }
 		else
 		{
-//			PxVec3 pos = m_pRigidbody->getGlobalPos().p;
-//            printf("golf collision exit, hit gameobject layer %d , name: %s  pos(%f, %f, %f)\n", p_collision->dominanceGroup, p_collision->name, pos.x, pos.y, pos.z);
-			//PxVec3 pos = m_pRigidbody->getGlobalPos().p;
-			//std::cout << "golf collision exit" << " ball x " << pos.x << " y " << pos.y << " z " << pos.z << std::endl;
+            PxVec3 pos = m_pRigidbody->getGlobalPos().p;
+            printf("golf collision exit, hit gameobject layer %d , name: %s  pos(%f, %f, %f)\n", p_collision->dominanceGroup, p_collision->name, pos.x, pos.y, pos.z);
 		}
 	}
 
@@ -168,7 +162,7 @@ namespace Golf3D
         if (m_pFunTriggerEnter != NULL) { (*m_pFunTriggerEnter)(p_collider); }
         else
         {
-            //PxVec3 pos = m_pRigidbody->getGlobalPos().p;
+//            PxVec3 pos = m_pRigidbody->getGlobalPos().p;
             printf("golf trigger enter, hit gameobject layer %d , name: %s \n", p_collider->dominanceGroup, p_collider->name);
             //std::cout << "golf trigger enter" << " ball x " << pos.x << " y " << pos.y << " z " << pos.z << std::endl;
         }
@@ -179,7 +173,7 @@ namespace Golf3D
         if (m_pFunTriggerStay != NULL) { (*m_pFunTriggerStay)(p_collider); }
         else
         {
-            //PxVec3 pos = m_pRigidbody->getGlobalPos().p;
+//            PxVec3 pos = m_pRigidbody->getGlobalPos().p;
             printf("golf trigger stay, hit gameobject layer %d , name: %s \n", p_collider->dominanceGroup, p_collider->name);
             //std::cout << "golf trigger stay" << " ball x " << pos.x << " y " << pos.y << " z " << pos.z << std::endl;
         }
@@ -191,7 +185,7 @@ namespace Golf3D
         else
         {
             printf("golf trigger exit, hit gameobject layer %d , name: %s \n", p_collider->dominanceGroup, p_collider->name);
-            //PxVec3 pos = m_pRigidbody->getGlobalPos().p;
+//            PxVec3 pos = m_pRigidbody->getGlobalPos().p;
             //std::cout << "golf trigger exit" << " ball x " << pos.x << " y " << pos.y << " z " << pos.z << std::endl;
         }
 	}

@@ -29,8 +29,9 @@ namespace Golf3D
 		virtual void OnTriggerEnter(Collider* p_collider);
 		virtual void OnTriggerStay(Collider* p_collider);
 		virtual void OnTriggerExit(Collider* p_collider);
-
-
+        
+        void CleanCallback();
+        
 		void InitUpdateCallback(Action pFixedUpdate);
 		void InitCollisionCallback(ActionCollision pCollisionEnter, ActionCollision pCollisionStay, ActionCollision pCollisionExit);
         void InitTriggerCallback(ActionTrigger pTriggerEnter, ActionTrigger pTriggerStay, ActionTrigger pTriggerExit);

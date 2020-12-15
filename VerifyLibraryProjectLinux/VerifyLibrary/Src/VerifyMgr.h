@@ -6,13 +6,13 @@
 class VerifyMgr
 {
 public:
-	VerifyMgr();
+	VerifyMgr(unsigned int iSceneConcurrencyCnt);
 	~VerifyMgr();
 	int GetFreeSlotIndex(int sceneId);
 	void BackSlotIndex(int sceneId, int slotIndex);
     SimulationMgr* GetSimulationMgr(int slotIndex);
 private:
-	const int g_len = 25;	
+    unsigned int m_iSceneConcurrencyCnt;
 	std::map<int,IndexQue*> mapIndexQueue; //key sceneId
 	std::map<unsigned int,SimulationMgr*> mapSimulationMgr; //key slotIndex
 	MyMutex* m_pMutex;
