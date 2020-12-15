@@ -40,7 +40,7 @@ VerifyMgr::~VerifyMgr()
 int VerifyMgr::GetFreeSlotIndex(int sceneId)
 {
 	int index;
-	//Èç¹û²»´æÔÚ£¬Ôò²åÈëµ½map
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½ëµ½map
 	std::map<int, IndexQue*>::iterator iter;
 
 	m_pMutex->Lock();
@@ -68,16 +68,19 @@ int VerifyMgr::GetFreeSlotIndex(int sceneId)
 
 void VerifyMgr::BackSlotIndex(int sceneId, int slotIndex)
 {
+	m_pMutex->Lock();
 	std::map<int, IndexQue*>::iterator iter;
 	iter = mapIndexQueue.find(sceneId);
 	if(iter != mapIndexQueue.end())
 	{
 		iter->second->PushSlotIndex(slotIndex);
 	}
+	m_pMutex->Unlock();
 }
 
 SimulationMgr* VerifyMgr::GetSimulationMgr(int slotIndex)
 {
+	m_pMutex->Lock();
     std::map<unsigned int, SimulationMgr*>::iterator iter;
     iter = mapSimulationMgr.find(slotIndex);
     if (iter != mapSimulationMgr.end())
@@ -90,4 +93,5 @@ SimulationMgr* VerifyMgr::GetSimulationMgr(int slotIndex)
         mapSimulationMgr.insert(std::pair<unsigned int, SimulationMgr*>(slotIndex, pSimualteMgr));
         return pSimualteMgr;
     }
+	m_pMutex->Unlock();
 }
