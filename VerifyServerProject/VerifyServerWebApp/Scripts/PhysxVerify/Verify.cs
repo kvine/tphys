@@ -13,6 +13,7 @@ namespace AuthServer.PhysxVerify
         {
             //获得有效的闲置索引， 
             int slotIndex = PhysicsInvoke.GetIndex(sceneId);
+             Console.WriteLine("-----slotIndex="+slotIndex);
             if(slotIndex < 0)
             {
                 return CalculateResult(sceneId, sceneName, sceneFile, ccStrickData, golfHolePos);
